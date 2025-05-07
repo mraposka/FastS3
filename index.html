@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükleme Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1E90FF, #00CED1);
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .btn-container {
+            display: flex;
+            gap: 20px;
+        }
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-btn {
+            background-color: #FFD700;
+            color: black;
+        }
+        .files-btn {
+            background-color: #32CD32;
+            color: white;
+        }
+        .map-btn {
+            background-color: #cda932;
+            color: white;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 600px) {
+            .btn-container {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Selni ❤️ Kurthna </h1>
+    <div class="btn-container">
+        <button class="btn map-btn" onclick="window.location.href='/map'">📁 Konumlar</button>
+    </div><br>
+    <div class="btn-container">
+        <button class="btn upload-btn" onclick="window.location.href='/upload'">📤 Dosya Yükle</button>
+    </div><br>
+    <div class="btn-container">
+        <button class="btn files-btn" onclick="window.location.href='/files'">📁 Dosyaları Gör</button>
+    </div>
+
+</body>
+</html>

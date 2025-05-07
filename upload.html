@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .upload-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .upload-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-btn:hover {
+            background: #218838;
+        }
+        #status {
+            margin-top: 10px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Dosya Yükle</h2>
+    <h2><a href="/files">Yüklü Dosyalar</a></h2>
+    <div class="upload-container">
+        <input type="file" id="fileInput">
+        <button class="upload-btn" onclick="uploadFile()">Yükle</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files.length) {
+                alert("Lütfen bir dosya seçin!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById("status").textContent = result.message || "Hata!";
+
+            if (response.ok) {
+                setTimeout(() => {
+                    window.location.href = "/"; // **Anasayfaya yönlendir**
+                }, 1500);
+            }
+        }
+    </script>
+
+</body>
+</html>

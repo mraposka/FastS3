@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #login-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #error-message {
+            color: #dc3545;
+            margin-top: 15px;
+        }
+
+        #content {
+            display: none;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #content h2 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .file-item {
+            width: 150px;
+            /* Biraz daha genişletildi */
+            text-align: center;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            /* Flexbox yapısını etkinleştir */
+            flex-direction: column;
+            /* Öğeleri dikey olarak sırala */
+            align-items: center;
+            /* Yatayda ortala */
+        }
+
+        .file-item img {
+            width: 100%;
+            height: auto;
+            max-height: 100px;
+            /* Resim yüksekliğini biraz azalttım */
+            object-fit: cover;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+
+        .file-item a {
+            display: block;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 12px;
+            margin-bottom: 5px;
+            /* Alt boşluk eklendi */
+        }
+
+        .file-item a:hover {
+            text-decoration: underline;
+        }
+
+        .file-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: auto;
+            /* Butonu en alta yasla */
+            transition: background-color 0.3s ease;
+            width: 80%;
+            /* Buton genişliğini ayarla */
+        }
+
+        .file-item button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-container">
+        <h2>Giriş Yap</h2>
+        <label for="username">Kullanıcı Adı:</label>
+        <input type="text" id="username">
+        <label for="password">Şifre:</label>
+        <input type="password" id="password">
+        <button onclick="authenticate()">Giriş</button>
+        <p id="error-message"></p>
+    </div>
+
+    <div id="content">
+        <h2>Yüklenen Dosyalar</h2>
+        <h2><a href="/upload"
+                style="display: inline-block; margin-bottom: 15px; text-decoration: none; color: #007bff;">Dosya
+                Yükle</a></h2>
+        <div class="gallery" id="fileList">Dosyalar yükleniyor...</div>
+    </div>
+
+    <script>
+        const contentDiv = document.getElementById('content');
+        const loginContainer = document.getElementById('login-container');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        let isAuthenticated = false;
+
+        async function authenticate() {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            const base64Credentials = btoa(`${username}:${password}`);
+
+            try {
+                const response = await fetch("/api/check-auth", {
+                    headers: {
+                        'Authorization': `Basic ${base64Credentials}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    isAuthenticated = true;
+                    loginContainer.style.display = 'none';
+                    contentDiv.style.display = 'block';
+                    fetchFiles();
+                } else {
+                    errorMessage.textContent = 'Yanlış kullanıcı adı veya şifre.';
+                }
+            } catch (error) {
+                console.error("Kimlik doğrulama hatası:", error);
+                errorMessage.textContent = 'Kimlik doğrulama sırasında bir hata oluştu.';
+            }
+        }
+
+        async function fetchFiles() {
+            if (!isAuthenticated) {
+                return;
+            }
+            try {
+                const response = await fetch("/api/files");
+                if (!response.ok) {
+                    console.error("Dosya getirme hatası:", response.status);
+                    document.getElementById("fileList").innerHTML = "<p>Dosyalar yüklenirken bir hata oluştu.</p>";
+                    return;
+                }
+                const files = await response.json();
+                const fileList = document.getElementById("fileList");
+                fileList.innerHTML = "";
+
+                if (!Array.isArray(files) || files.length === 0) {
+                    fileList.innerHTML = "<p>Henüz dosya yüklenmedi.</p>";
+                    return;
+                }
+
+                files.forEach(file => {
+                    const div = document.createElement("div");
+                    div.className = "file-item";
+
+                    let fileDisplay;
+                    if (file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                        fileDisplay = `<img src="${file.url}" alt="${file.name}">`;
+                    } else {
+                        fileDisplay = `<img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="Dosya">`;
+                    }
+
+                    div.innerHTML = `
+                        ${fileDisplay}
+                        <a href="${file.url}" target="_blank">${file.name}</a>
+                        <button onclick="deleteFile('${file.name}')">Sil</button>
+                    `;
+
+                    fileList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Dosyalar yüklenirken hata oluştu:", error);
+                document.getElementById("fileList").innerHTML = "<p>Dosyalar yüklenirken bir hata oluştu.</p>";
+            }
+        }
+
+        async function deleteFile(fileName) {
+            if (!isAuthenticated) {
+                alert("Silme işlemi için yetkili olmanız gerekmektedir.");
+                return;
+            }
+            if (confirm(`'${fileName}' adlı dosyayı silmek istediğinize emin misiniz?`)) {
+                try {
+                    const response = await fetch("/api/delete-file", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Basic ${btoa(usernameInput.value + ':' + passwordInput.value)}` // Kimlik doğrulama için tekrar gönderiyoruz (basit örnek)
+                        },
+                        body: JSON.stringify({ fileName: `uploads/${fileName}` }) // S3'teki tam anahtar
+                    });
+
+                    if (response.ok) {
+                        alert(`'${fileName}' adlı dosya başarıyla silindi.`);
+                        fetchFiles(); // Dosya listesini yeniden yükle
+                    } else if (response.status === 401) {
+                        alert("Silme işlemi için yetkiniz yok. Lütfen tekrar giriş yapın.");
+                        loginContainer.style.display = 'block';
+                        contentDiv.style.display = 'none';
+                        isAuthenticated = false;
+                    } else {
+                        const errorData = await response.json();
+                        console.error("Dosya silme hatası:", errorData);
+                        alert(`Dosya silinirken bir hata oluştu: ${errorData.error || response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error("Dosya silme hatası:", error);
+                    alert("Dosya silinirken bir hata oluştu.");
+                }
+            }
+        }
+
+        // Sayfa yüklendiğinde giriş ekranını göster
+        contentDiv.style.display = 'none';
+        loginContainer.style.display = 'block';
+    </script>
+
+</body>
+
+</html>
