@@ -38,7 +38,7 @@ git clone https://github.com/mraposka/FastS3
 nano deploy.sh
 ```
 
-2. Run deployment script:
+3. Run deployment script:
 ```bash
 sudo bash deploy.sh
 ```
