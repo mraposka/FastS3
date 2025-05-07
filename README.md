@@ -33,6 +33,11 @@ A secure and scalable event management system that provides location-based stora
 git clone https://github.com/mraposka/FastS3
 ```
 
+2. Change ip address to your aws web server(SERVER_IP):
+```bash
+nano deploy.sh
+```
+
 2. Run deployment script:
 ```bash
 sudo bash deploy.sh
