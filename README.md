@@ -1,4 +1,4 @@
-# FASTS3 - Event Management System
+# FASTS3 - Event Management System [Demo Video](https://www.youtube.com/watch?v=5e69Yg-t4wo)
 
 A secure and scalable event management system that provides location-based storage solutions for various events like weddings, group trips, and gatherings.
 
